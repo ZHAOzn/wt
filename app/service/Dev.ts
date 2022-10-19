@@ -25,6 +25,12 @@ export default class DevService extends Service {
         return await ctx.model.Dev.create({ ...data })
     }
 
+    public async update(id: number, data: any) {
+        const { ctx } = this;
+        // await ctx.model.Dev.update({ ...data }, { where: { id: id } })
+        await ctx.model.Dev.sequelize?.query(`UPDATE dev set type = concat(IFNULL(type,''),${data.type}) WHERE id=${id}`)
+    }
+
     public async insertInfo(lang: string, data: any) {
         const { ctx } = this;
         if (lang === 'zh')
@@ -37,9 +43,11 @@ export default class DevService extends Service {
     /**
      * 向wt官网请求新的dev
      * @param lang 语言，判断请求中文链接还是英文链接?'zh':'en'
+     * @param type 检索类型，'自动','手动'
+     * @param num 检索数据数量
      * @returns dev数据，{官网新闻链接、图片、标题、简介、标注的发布时间}
      */
-    public async checkDev(lang = 'zh', type = '自动') {
+    public async checkDev(lang = 'zh', type = '自动', num = 1) {
         const { ctx } = this;
         const axios = require('axios');
         const cheerio = require('cheerio');
@@ -55,15 +63,34 @@ export default class DevService extends Service {
 
         if (req.status) {
             const $ = cheerio.load(req.data)
+            const devs: { link: string, img: string, name: string, intro: string, date: Date }[] = []
 
-            const link = `https://warthunder.com${$('body .content .section .showcase .showcase__content-wrapper .showcase__item .widget__link').attr('href')}`
-            const img = `https:${$('body .content .section .showcase .showcase__content-wrapper .showcase__item .widget__poster .widget__poster-media').attr('data-src')}`
-            const name = `${$('body .content .section .showcase .showcase__content-wrapper .showcase__item .widget__content .widget__title').html()}`.replace(/\r|\n/ig, "").replace(/^\s*|\s*$/g, "")
-            const intro = `${$('body .content .section .showcase .showcase__content-wrapper .showcase__item .widget__content .widget__comment').html()}`.replace(/\r|\n/ig, "").replace(/^\s*|\s*$/g, "")
-            const date = `${$('body .content .section .showcase .showcase__content-wrapper .showcase__item .widget__content .widget__meta .widget-meta__item--right').html()}`.replace(/\r|\n/ig, "").replace(/^\s*|\s*$/g, "")
+            for (let i = 0; i < num; i++) {
+                // const element = array[index];
+                const el = $('body .content .section .showcase .showcase__content-wrapper .showcase__item').eq(i)
+                const link = `https://warthunder.com${el.find('.widget__link').attr('href')}`
+                const img = `https:${el.find('.widget__poster .widget__poster-media').attr('data-src')}`
+                const name = el.find('.widget__content .widget__title').html().replace(/\r|\n/ig, "").replace(/^\s*|\s*$/g, "")
+                const intro = el.find('.widget__content .widget__comment').html().replace(/\r|\n/ig, "").replace(/^\s*|\s*$/g, "")
+                const date = el.find('.widget__content .widget__meta .widget-meta__item--right').html().replace(/\r|\n/ig, "").replace(/^\s*|\s*$/g, "")
+                devs.push({ link, img, name, intro, date: await this.ctx.service.utils.getDate(date) })
+            }
 
-            const latestDev = { link, img, name, intro, date: await this.ctx.service.utils.getDate(date) }
-            return latestDev;
+
+            // const link = `https://warthunder.com${$('body .content .section .showcase .showcase__content-wrapper .showcase__item .widget__link').attr('href')}`
+            // const img = `https:${$('body .content .section .showcase .showcase__content-wrapper .showcase__item .widget__poster .widget__poster-media').attr('data-src')}`
+            // const name = `${$('body .content .section .showcase .showcase__content-wrapper .showcase__item .widget__content .widget__title').html()}`.replace(/\r|\n/ig, "").replace(/^\s*|\s*$/g, "")
+            // const intro = `${$('body .content .section .showcase .showcase__content-wrapper .showcase__item .widget__content .widget__comment').html()}`.replace(/\r|\n/ig, "").replace(/^\s*|\s*$/g, "")
+            // const date = `${$('body .content .section .showcase .showcase__content-wrapper .showcase__item .widget__content .widget__meta .widget-meta__item--right').html()}`.replace(/\r|\n/ig, "").replace(/^\s*|\s*$/g, "")
+
+            // const latestDev = { link, img, name, intro, date: await this.ctx.service.utils.getDate(date) }
+            // console.log(latestDev);
+
+            // return latestDev;
+
+            // return $('body .content .section .showcase .showcase__content-wrapper .showcase__item').eq(1).find('.widget__link').attr('href')
+            return devs
+
         }
     }
 
@@ -93,7 +120,7 @@ export default class DevService extends Service {
                 const type = arr[1]
 
                 return { tech, type, str, arr }
-            }
+            } else return false
 
 
 
@@ -125,9 +152,9 @@ export default class DevService extends Service {
     // public async getType(intro: string) {
     //     // console.log(intro);
 
-    //     const typelist = [['主站坦克', '自行防空炮', '试验车', 'MBT', 'SPAAG', 'ground vehicles']]
+    //     const types = [['主站坦克', '自行防空炮', '中型坦克', '轻型坦克', '重型坦克', '坦克歼击车', '自行火炮','反坦克导弹运载车','自行榴弹炮', 'MBT', 'SPAAG', 'ground vehicles']]
 
-    //     console.log(typelist);
+    //     console.log(types);
 
     //     return intro
     // }
