@@ -13,10 +13,10 @@ export default class checkDev extends Subscription {
         const { ctx } = this;
         const mission = await ctx.service.missionCheck.index();
         // console.log(mission);
-        if (mission.id) {
+        if (mission && mission.id) {
             const detail = await ctx.service.dev.checkDevDetail(mission.url)
             if (detail) {
-                await ctx.service.dev.update(mission.dev_id, { type: detail.type })
+                await ctx.service.dev.update(mission.devc_id, { type: detail.type })
                 await ctx.service.missionCheck.update(mission.id, { status: 1 })
             } else {
                 await ctx.service.missionCheck.update(mission.id, { status: 1 })
