@@ -5,15 +5,14 @@ export default class checkDev extends Subscription {
     // 通过 schedule 属性来设置定时任务的执行间隔等配置
     static get schedule() {
         return {
-            interval: '1m', // 15 分钟间隔
-            // cron: '0 0/15 0,1,2,3,16,17,18,19,20,21,22,23 * * *',
+            // interval: '1m', // 15 分钟间隔
+            cron: '0 0/15 0,1,2,3,16,17,18,19,20,21,22,23 * * *',
             type: 'worker', // 指定随机一个 worker 执行
         };
     }
 
     // subscribe 是真正定时任务执行时被运行的函数
     async subscribe() {
-        // const { ctx } = this
         const getData = async (lang: string) => {
             const { ctx } = this;
             const foreignData = await ctx.service.dev.checkDev(lang, '自动', 2);
@@ -32,7 +31,7 @@ export default class checkDev extends Subscription {
                             const res = await ctx.service.dev.insert({ version_id: 3, ...iterator });
                             //dev详情表插入数据
                             await ctx.service.dev.insertInfo(lang, { dev_id: res.id, ...iterator, time: iterator.date, recording_time: new Date(), lang, real_time_slot: await ctx.service.dev.getTimeSlot(new Date(), 15 * 60000) })
-
+                            ctx.service.missionCheck.insert({ url: iterator.link, table: 'Dev', dev_id: res.id, key: 'type,tech' })
                         }
                         //如果数据库里有 
                         else {
@@ -40,8 +39,10 @@ export default class checkDev extends Subscription {
                             //如果数据库里没有详情
                             if (key === -1) {
                                 await ctx.service.dev.insertInfo(lang, { dev_id: isExist.id, ...iterator, time: iterator.date, recording_time: new Date(), lang, real_time_slot: await ctx.service.dev.getTimeSlot(new Date(), 15 * 60000) })
+                                ctx.service.missionCheck.insert({ url: iterator.link, table: 'Dev', dev_id: isExist.id, key: 'type,tech' })
                             }
                         }
+
 
                         // const detail = await ctx.service.dev.checkDevDetail(foreignData.link)
                         // if (detail) {
@@ -59,15 +60,6 @@ export default class checkDev extends Subscription {
         }
         await getData('zh');
         await getData('en');
-
-
-        // if(isExist.findIndex(val=>val==='zh') === -1)
-        //     await.
-
-        // const res = await this.ctx.curl('http://www.api.com/cache', {
-        //     dataType: 'json',
-        // });
-        // this.ctx.app.cache = res.data;
     }
 
 }

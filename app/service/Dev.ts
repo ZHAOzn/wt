@@ -28,7 +28,8 @@ export default class DevService extends Service {
     public async update(id: number, data: any) {
         const { ctx } = this;
         // await ctx.model.Dev.update({ ...data }, { where: { id: id } })
-        await ctx.model.Dev.sequelize?.query(`UPDATE dev set type = concat(IFNULL(type,''),${data.type}) WHERE id=${id}`)
+        await ctx.model.Dev.sequelize?.query(`UPDATE dev set type = concat(IFNULL(type,''),'${data.type}') WHERE id=${id}`)
+        // return {results,metadata}
     }
 
     public async insertInfo(lang: string, data: any) {
