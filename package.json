@@ -1,0 +1,61 @@
+{
+  "name": "wt",
+  "version": "1.0.0",
+  "description": "wt的dev可视化数据",
+  "private": true,
+  "egg": {
+    "typescript": true,
+    "declarations": true
+  },
+  "scripts": {
+    "start": "MOCK_HOME_DIR=../export/logs/wt egg-scripts start --daemon --title=egg-server-wt --port=7003",
+    "stop": "egg-scripts stop --title=egg-server-wt",
+    "dev": "egg-bin dev",
+    "debug": "egg-bin debug",
+    "test-local": "egg-bin test",
+    "test": "npm run lint -- --fix && npm run test-local",
+    "cov": "egg-bin cov",
+    "tsc": "ets && tsc -p tsconfig.json",
+    "ci": "npm run lint && npm run cov && npm run tsc",
+    "autod": "autod",
+    "lint": "eslint . --ext .ts --resolve-plugins-relative-to .",
+    "clean":"tsc -b --clean"
+  },
+  "dependencies": {
+    "axios": "^1.1.2",
+    "cheerio": "^1.0.0-rc.12",
+    "egg": "^2.6.1",
+    "egg-scripts": "^2.6.0",
+    "egg-sequelize": "^6.0.0",
+    "mysql2": "^2.3.3"
+  },
+  "devDependencies": {
+    "@eggjs/tsconfig": "^1.0.0",
+    "@types/mocha": "^2.2.40",
+    "@types/node": "^7.0.12",
+    "@types/supertest": "^2.0.0",
+    "autod": "^3.0.1",
+    "autod-egg": "^1.1.0",
+    "egg-bin": "^4.11.0",
+    "egg-ci": "^2.1.0",
+    "egg-mock": "^3.16.0",
+    "eslint": "^8.0.0",
+    "eslint-config-egg": "^12.0.0",
+    "typescript": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "ci": {
+    "version": "14, 16, 18"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "eslintIgnore": [
+    "coverage"
+  ],
+  "author": "AL",
+  "license": "MIT"
+}
