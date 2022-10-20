@@ -34,4 +34,5 @@ export default class DevController extends Controller {
         const res = await ctx.service.dev.insert({ version_id: 3, ...data });
         ctx.body = { code: 200, data: res }
     }
+
 }

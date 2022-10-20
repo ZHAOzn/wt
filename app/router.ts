@@ -13,5 +13,4 @@ export default (app: Application) => {
 
   router.get('/dev/detail/:id', controller.dev.detail)
   router.post('/transTime', controller.home.transTime)
-
 };

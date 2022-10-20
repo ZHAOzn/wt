@@ -6,10 +6,11 @@ export default class checkDev extends Subscription {
     static get schedule() {
         return {
             // interval: '1m', // 15 分钟间隔
-            cron: '0 0/12 0,1,2,3,4,16,17,18,19,20,21,22,23 * * *',
+            cron: '0 0/21 5,6,7,8,9,11,13,14 * * *',
             type: 'worker', // 指定随机一个 worker 执行
         };
     }
+
 
     // subscribe 是真正定时任务执行时被运行的函数
     async subscribe() {
@@ -30,7 +31,7 @@ export default class checkDev extends Subscription {
                             //dev表插入数据
                             const res = await ctx.service.dev.insert({ version_id: 3, ...iterator });
                             //dev详情表插入数据
-                            await ctx.service.dev.insertInfo(lang, { dev_id: res.id, ...iterator, time: iterator.date, recording_time: new Date(), lang, real_time_slot: await ctx.service.dev.getTimeSlot(new Date(), 12 * 60000) })
+                            await ctx.service.dev.insertInfo(lang, { dev_id: res.id, ...iterator, time: iterator.date, recording_time: new Date(), lang, real_time_slot: await ctx.service.dev.getTimeSlot(new Date(), 21 * 60000) })
                             ctx.service.missionCheck.insert({ url: iterator.link, table: 'Dev', dev_id: res.id, key: 'type,tech' })
                         }
                         //如果数据库里有 
@@ -38,7 +39,7 @@ export default class checkDev extends Subscription {
                             const key = isExist.data.findIndex(val => val === lang)
                             //如果数据库里没有详情
                             if (key === -1) {
-                                await ctx.service.dev.insertInfo(lang, { dev_id: isExist.id, ...iterator, time: iterator.date, recording_time: new Date(), lang, real_time_slot: await ctx.service.dev.getTimeSlot(new Date(), 12 * 60000) })
+                                await ctx.service.dev.insertInfo(lang, { dev_id: isExist.id, ...iterator, time: iterator.date, recording_time: new Date(), lang, real_time_slot: await ctx.service.dev.getTimeSlot(new Date(), 21 * 60000) })
                                 ctx.service.missionCheck.insert({ url: iterator.link, table: 'Dev', dev_id: isExist.id, key: 'type,tech' })
                             }
                         }

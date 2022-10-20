@@ -11,6 +11,13 @@ export default (appInfo: EggAppInfo) => {
   // add your egg config in here
   config.middleware = ["errorHandler"];
 
+  config.customLoader = {
+    utils: {
+      directory: 'app/utils',
+      inject: 'app'
+    }
+  }
+
   // add your special config in here
   const bizConfig = {
     sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,
@@ -52,6 +59,9 @@ export default (appInfo: EggAppInfo) => {
       // headerName: 'x-csrf-token', // 通过 header 传递 CSRF token 的默认字段为 x-csrf-token
     },
   };
+
+
+
 
   // the return config will combines to EggAppConfig
   return {

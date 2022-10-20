@@ -1,4 +1,5 @@
 import { Service } from 'egg';
+// import AlDate from '../utils/getDate';
 export default class DevService extends Service {
     public async index(opt?: {}) {
         const { ctx } = this
@@ -145,9 +146,21 @@ export default class DevService extends Service {
     }
 
 
+    /**
+     * 
+     * @param date 入库时间
+     * @param time 时间差ms
+     * @returns 
+     */
     public async getTimeSlot(date: Date, time: number) {
-        const latest = new Date(date.getTime() - time)
-        return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()} —— ${latest.getHours()}:${latest.getMinutes()}:${latest.getSeconds()}`;
+        const { app } = this;
+        const leftDate = await app.utils.getDate(date.getTime() - time)
+        const rightDate =  await app.utils.getDate(date)
+        
+        return `${leftDate.getFullHours()}:${leftDate.getFullMinutes()}:${leftDate.getFullSeconds()} —— ${rightDate.getFullHours()}:${rightDate.getFullMinutes()}:${rightDate.getFullSeconds()}`
+
+        // const latest = new Date(date.getTime() - time)
+        // return `${latest.getHours()}:${latest.getMinutes()}:${latest.getSeconds()} —— ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
     }
 
     // public async getType(intro: string) {
