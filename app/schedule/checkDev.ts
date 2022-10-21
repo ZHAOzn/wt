@@ -28,7 +28,7 @@ export default class checkDev extends Subscription {
                         if (!isExist.id) {
 
                             //dev表插入数据
-                            const res = await ctx.service.dev.insert({ version_id: 3, ...iterator });
+                            const res = await ctx.service.dev.insert({ version_id: 3, ...iterator, is_before_dev: 0 });
                             //dev详情表插入数据
                             await ctx.service.dev.insertInfo(lang, { dev_id: res.id, ...iterator, time: iterator.date, recording_time: new Date(), lang, real_time_slot: await ctx.service.dev.getTimeSlot(new Date(), 12 * 60000) })
                             ctx.service.missionCheck.insert({ url: iterator.link, table: 'Dev', dev_id: res.id, key: 'type,tech' })

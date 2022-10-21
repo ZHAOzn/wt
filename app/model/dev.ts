@@ -8,6 +8,7 @@ export default function (app: Application) {
         type: { type: STRING(50), allowNull: true },
         version_id: { type: INTEGER, allowNull: false },
         tech_id: { type: INTEGER, allowNull: true },
+        is_before_dev: { type: INTEGER, allowNull: true }
         // zh_id: { type: INTEGER, allowNull: true },
         // en_id: { type: INTEGER, allowNull: true },
     }, {
@@ -19,8 +20,8 @@ export default function (app: Application) {
 
     return class Dev extends Model {
         static associate() {
-            (app.model.Dev as any).hasOne(app.model.DevZh, { as: 'zh',foreignKey: 'dev_id' ,targetKey:'id' });
-            (app.model.Dev as any).hasOne(app.model.DevEn, { as: 'en',foreignKey: 'dev_id' ,targetKey:'id' });
+            (app.model.Dev as any).hasOne(app.model.DevZh, { as: 'zh', foreignKey: 'dev_id', targetKey: 'id' });
+            (app.model.Dev as any).hasOne(app.model.DevEn, { as: 'en', foreignKey: 'dev_id', targetKey: 'id' });
         }
     };
 
