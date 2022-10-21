@@ -4,7 +4,7 @@ export default class checkDev extends Subscription {
     static get schedule() {
         return {
             // interval: '1m', // 15 分钟间隔
-            cron: '0 0/30 6,7,12 * * *',
+            cron: '0 0/30 6,8,12 * * *',
             type: 'worker', // 指定随机一个 worker 执行
         };
     }
@@ -16,7 +16,8 @@ export default class checkDev extends Subscription {
         if (mission && mission.id) {
             const detail = await ctx.service.dev.checkDevDetail(mission.url)
             if (detail) {
-                await ctx.service.dev.update(mission.dev_id, { type: detail.type })
+                const tech = await ctx.service.dev.getTech(detail.tech)
+                await ctx.service.dev.update(mission.dev_id, { type: detail.type, tech: tech ? tech.id : null })
                 await ctx.service.missionCheck.update(mission.id, { status: 1 })
             } else {
                 await ctx.service.missionCheck.update(mission.id, { status: 1 })

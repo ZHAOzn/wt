@@ -6,7 +6,8 @@ export default class DevService extends Service {
         return await ctx.model.Dev.findAll({
             ...opt, include: [
                 { model: ctx.model.DevEn, as: "en" },
-                { model: ctx.model.DevZh, as: "zh" }
+                { model: ctx.model.DevZh, as: "zh" },
+                { model: ctx.model.Tech, as: 'tech' }
             ]
         })
     }
@@ -26,10 +27,15 @@ export default class DevService extends Service {
         return await ctx.model.Dev.create({ ...data })
     }
 
+    /**
+     * 更新dev表type
+     * @param id 目标id
+     * @param data 更新的数据
+     */
     public async update(id: number, data: any) {
         const { ctx } = this;
         // await ctx.model.Dev.update({ ...data }, { where: { id: id } })
-        await ctx.model.Dev.sequelize?.query(`UPDATE dev set type = concat(IFNULL(type,''),'${data.type}') WHERE id=${id}`)
+        return await ctx.model.Dev.sequelize?.query(`UPDATE dev set type = concat(IFNULL(type,''),'${data.type}') , tech_id = '${data.tech}' WHERE id=${id}`)
         // return {results,metadata}
     }
 
@@ -96,6 +102,12 @@ export default class DevService extends Service {
         }
     }
 
+    /**
+     * 向wit官网请求dev详情
+     * @param url 目标地址
+     * @param type 检索类型
+     * @returns 详情数据{科技树,类型,html字符串}
+     */
     public async checkDevDetail(url, type = '自动') {
         const { ctx } = this;
         const axios = require('axios');
@@ -147,30 +159,37 @@ export default class DevService extends Service {
 
 
     /**
-     * 
+     * 获取时间段
      * @param date 入库时间
      * @param time 时间差ms
-     * @returns 
+     * @returns 时间段String，例:"21:00:01 —— 21:15:01"
      */
     public async getTimeSlot(date: Date, time: number) {
         const { app } = this;
         const leftDate = await app.utils.getDate(date.getTime() - time)
-        const rightDate =  await app.utils.getDate(date)
-        
+        const rightDate = await app.utils.getDate(date)
+
         return `${leftDate.getFullHours()}:${leftDate.getFullMinutes()}:${leftDate.getFullSeconds()} —— ${rightDate.getFullHours()}:${rightDate.getFullMinutes()}:${rightDate.getFullSeconds()}`
 
         // const latest = new Date(date.getTime() - time)
         // return `${latest.getHours()}:${latest.getMinutes()}:${latest.getSeconds()} —— ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
     }
 
-    // public async getType(intro: string) {
-    //     // console.log(intro);
+    public async getTech(tech: string) {
+        const { ctx } = this;
+        const tech_noSymbol = tech.replace(/[,，.。\/\\]/g, ',').split(',');
+        const techs = await ctx.service.tech.index();
+        const key = techs.findIndex((val: any) => {
+            for (const iterator of tech_noSymbol) {
+                if (val.keyword.match(RegExp(iterator))) {
+                    return true;
+                }
+            }
+            return false
+        })
 
-    //     const types = [['主站坦克', '自行防空炮', '中型坦克', '轻型坦克', '重型坦克', '坦克歼击车', '自行火炮','反坦克导弹运载车','自行榴弹炮', 'MBT', 'SPAAG', 'ground vehicles']]
-
-    //     console.log(types);
-
-    //     return intro
-    // }
+        if (key !== -1) return techs[key]
+        else return false
+    }
 
 }
