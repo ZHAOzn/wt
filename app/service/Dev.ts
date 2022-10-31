@@ -128,7 +128,7 @@ export default class DevService extends Service {
 
             const str = $('body .content .section.article').children('.g-grid').eq(1).children('.g-col').eq(0).children('h3').eq(0).html()
             if (str) {
-                const arr = str.replace(/，|, /g, ',').split(',')
+                const arr = str.replace(/，|,|、 /g, ',').split(',')
 
                 const tech = arr[2]
                 const type = arr[1]
