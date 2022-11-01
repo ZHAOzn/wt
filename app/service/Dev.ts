@@ -128,7 +128,7 @@ export default class DevService extends Service {
 
             const str = $('body .content .section.article').children('.g-grid').eq(1).children('.g-col').eq(0).children('h3').eq(0).html()
             if (str) {
-                const arr = str.replace(/，|,|、 /g, ',').split(',')
+                const arr = str.replace(/，|、|、 |， |, |,/g, ',').split(',')
 
                 const tech = arr[2]
                 const type = arr[1]
@@ -177,7 +177,7 @@ export default class DevService extends Service {
 
     public async getTech(tech: string) {
         const { ctx } = this;
-        const tech_noSymbol = tech.replace(/[,，.。\/\\]/g, ',').split(',');
+        const tech_noSymbol = tech.replace(' ', '').replace(/[,，.。\/\\]/g, ',').split(',');
         const techs = await ctx.service.tech.index();
         const key = techs.findIndex((val: any) => {
             for (const iterator of tech_noSymbol) {

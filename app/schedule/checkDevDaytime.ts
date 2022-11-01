@@ -16,7 +16,7 @@ export default class checkDev extends Subscription {
     async subscribe() {
         const getData = async (lang: string) => {
             const { ctx } = this;
-            const foreignData = await ctx.service.dev.checkDev(lang, '自动', 2);
+            const foreignData = await ctx.service.dev.checkDev(lang, '自动', 3);
             const localData = await ctx.service.dev.index({ limit: 5, order: [['created_at', 'DESC']] })
 
             if (foreignData.length > 0)
