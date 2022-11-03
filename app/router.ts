@@ -7,6 +7,11 @@ export default (app: Application) => {
   router.get('/checkdev', controller.dev.checkDev)
   router.get('/checkdev/detail', controller.dev.checkDevDetail)
 
+
+  /**
+   * 爬取dev
+   */
+  router.get('/dev/checkdevs', controller.dev.checkOldDevs)
   //dev列表
   router.get('/dev/index', controller.dev.index)
   //dev详情

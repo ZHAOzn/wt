@@ -8,7 +8,7 @@ export default function (app: Application) {
         name: { type: STRING(255), allowNull: false },
         link: { type: TEXT, allowNull: true },
         intro: { type: STRING(255), allowNull: true },
-        img: { type: STRING(255), allowNull: false },
+        img: { type: TEXT, allowNull: false },
         lang: { type: STRING(5), allowNull: false },
         time: { type: DATE, allowNull: false },
         recording_time: { type: DATE, allowNull: false },

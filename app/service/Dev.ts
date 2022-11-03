@@ -8,7 +8,8 @@ export default class DevService extends Service {
                 { model: ctx.model.DevEn, as: "en" },
                 { model: ctx.model.DevZh, as: "zh" },
                 { model: ctx.model.Tech, as: 'tech' }
-            ]
+            ],
+            order: [['en', 'time', 'DESC'], ['zh', 'time', 'DESC'], ['created_at', 'DESC']]
         })
     }
 
@@ -18,7 +19,7 @@ export default class DevService extends Service {
             include: [
                 { model: ctx.model.DevEn, as: "en" },
                 { model: ctx.model.DevZh, as: "zh" }
-            ],
+            ]
         })
     }
 
@@ -55,11 +56,11 @@ export default class DevService extends Service {
      * @param num 检索数据数量
      * @returns dev数据，{官网新闻链接、图片、标题、简介、标注的发布时间}
      */
-    public async checkDev(lang = 'zh', type = '自动', num = 1) {
+    public async checkDev(lang = 'zh', type = '自动', num = 1, page = 1) {
         const { ctx } = this;
         const axios = require('axios');
         const cheerio = require('cheerio');
-        const url = lang === 'zh' ? 'https://warthunder.com/zh/news/?tags=%E5%BC%80%E5%8F%91' : 'https://warthunder.com/en/news/?tags=Development'
+        const url = lang === 'zh' ? `https://warthunder.com/zh/news/${page > 1 ? 'page/' + page + '/' : ''}?tags=%E5%BC%80%E5%8F%91` : `https://warthunder.com/en/news/${page > 1 ? 'page/' + page + '/' : ''}?tags=Development`
 
         const req = await axios.get(url).then(res => {
             ctx.service.recordCheck.insert(res.status, res.statusText, type, url)
@@ -71,18 +72,23 @@ export default class DevService extends Service {
 
         if (req.status) {
             const $ = cheerio.load(req.data)
+            const devsLength: number = $('body .content .section .showcase .showcase__content-wrapper .showcase__item').length
+            const nums = num === 0 ? devsLength : num > devsLength ? devsLength : num
+
             const devs: { link: string, img: string, name: string, intro: string, date: Date }[] = []
 
-            for (let i = 0; i < num; i++) {
+            for (let i = 0; i < nums; i++) {
                 // const element = array[index];
                 const el = $('body .content .section .showcase .showcase__content-wrapper .showcase__item').eq(i)
                 const link = `https://warthunder.com${el.find('.widget__link').attr('href')}`
-                const img = `https:${el.find('.widget__poster .widget__poster-media').attr('data-src')}`
                 const name = el.find('.widget__content .widget__title').html().replace(/\r|\n/ig, "").replace(/^\s*|\s*$/g, "")
+                const img = el.find('.widget__poster .widget__poster-media').attr('data-src') ? `https:${el.find('.widget__poster .widget__poster-media').attr('data-src')}` : `undefined::${name}`;
                 const intro = el.find('.widget__content .widget__comment').html().replace(/\r|\n/ig, "").replace(/^\s*|\s*$/g, "")
                 const date = el.find('.widget__content .widget__meta .widget-meta__item--right').html().replace(/\r|\n/ig, "").replace(/^\s*|\s*$/g, "")
-                devs.push({ link, img, name, intro, date: await this.ctx.service.utils.getDate(date) })
+
+                devs.push({ link, img, name, intro, date: await this.ctx.service.utils.getDate(date ? date : '1 一月 1000') })
             }
+
 
 
             // const link = `https://warthunder.com${$('body .content .section .showcase .showcase__content-wrapper .showcase__item .widget__link').attr('href')}`
@@ -143,8 +149,47 @@ export default class DevService extends Service {
     }
 
     public async isExist(array, data) {
+        /**返回true为存在 */
+        const rule_1 = (img_1: string, img_2: string) => {
+            
+            if (!img_1 || !img_2) return false;
+
+            //获取两个img的文件名，并根据符号'_'转化为数组
+            const img_1_name = img_1.split('/')[img_1.split('/').length - 1].split('_')
+            const img_2_name = img_2.split('/')[img_2.split('/').length - 1].split('_')
+
+            //如果两个转化数组失败，则返回false
+            if (!(Array.isArray(img_1_name) && Array.isArray(img_2_name))) return false;
+            //如果两个数组长度差大于2，返回false，判定为不是同一个dev
+            if (img_1_name.length - img_2_name.length > 2 || img_1_name.length - img_2_name.length < -2) return false;
+
+            //获取两个数组中最短的长度，并截取两个数组的该长度数值
+            const length = img_1_name.length - img_2_name.length >= 0 ? img_1_name.length : img_2_name.length
+            img_1_name.length = img_2_name.length = length
+
+            //获取两个数组中，相等的数值个数
+            let num = 0;
+            for (let i = 0; i < length; i++) {
+                const img_1_is_lang = ['eng', 'en', 'zh', 'cn'].findIndex(val => val === img_1_name[i]) !== -1
+                const img_2_is_lang = ['eng', 'en', 'zh', 'cn'].findIndex(val => val === img_2_name[i]) !== -1
+                if ((img_1_name[i] !== img_2_name[i]) && !(img_1_is_lang && img_2_is_lang)) continue;
+                num++;
+            }
+
+            //当两个数组中，相等的比例大于70%时，判定为相等，返回true;
+            if (num / length > 0.7) return true;
+            else return false;
+
+
+        }
+
         if (data.img) {
-            const key = array.findIndex(val => val?.zh?.img === data.img || val?.en?.img === data.img)
+            // const key = array.findIndex(val => val?.zh?.img === data.img || val?.en?.img === data.img)
+
+            const key = array.findIndex(val => {
+                return val?.zh?.img === data.img || val?.en?.img === data.img || rule_1(val?.zh?.img, data.img) || rule_1(val?.en?.img, data.img)
+            })
+
             if (key !== -1) {
                 const res: string[] = []
                 if (array[key]?.zh?.img === data.img) res.push('zh')
