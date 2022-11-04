@@ -136,10 +136,14 @@ export default class DevService extends Service {
             if (str) {
                 const arr = str.replace(/，|、|、 |， |, |,/g, ',').split(',')
 
-                const tech = arr[2]
-                const type = arr[1]
+                if (arr.length > 3) {
+                    const tech = [arr[1], arr[2], arr[3]]
+                    const type = arr[1]
+                    return { tech, type, str, arr }
+                }
+                else return false
 
-                return { tech, type, str, arr }
+
             } else return false
 
 
@@ -151,7 +155,7 @@ export default class DevService extends Service {
     public async isExist(array, data) {
         /**返回true为存在 */
         const rule_1 = (img_1: string, img_2: string) => {
-            
+
             if (!img_1 || !img_2) return false;
 
             //获取两个img的文件名，并根据符号'_'转化为数组
@@ -220,21 +224,46 @@ export default class DevService extends Service {
         // return `${latest.getHours()}:${latest.getMinutes()}:${latest.getSeconds()} —— ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
     }
 
-    public async getTech(tech: string) {
+    public async getTech(tech: string | string[]) {
         const { ctx } = this;
-        const tech_noSymbol = tech.replace(' ', '').replace(/[,，.。\/\\]/g, ',').split(',');
-        const techs = await ctx.service.tech.index();
-        const key = techs.findIndex((val: any) => {
-            for (const iterator of tech_noSymbol) {
-                if (val.keyword.match(RegExp(iterator))) {
-                    return true;
-                }
-            }
-            return false
-        })
+        if (!Array.isArray(tech)) {
 
-        if (key !== -1) return techs[key]
-        else return false
+            const tech_noSymbol = tech.replace(' ', '').replace(/[,，.。\/\\]/g, ',').split(',');
+            const techs = await ctx.service.tech.index();
+            const key = techs.findIndex((val: any) => {
+                for (const iterator of tech_noSymbol) {
+                    if (val.keyword.match(RegExp(iterator))) {
+                        return true;
+                    }
+                }
+                return false
+            })
+            if (key !== -1) return techs[key]
+            else return false
+        } else {
+            const techs = await ctx.service.tech.index();
+            let keys = -1;
+            for (const item of tech) {
+                const tech_noSymbol = item.replace(' ', '').replace(/[&,，.。\/\\]/g, ',').split(',');
+                const key = techs.findIndex((val: any) => {
+                    for (const iterator of tech_noSymbol) {
+                        if (val.keyword.match(RegExp(iterator))) {
+                            return true;
+                        }
+                    }
+                    return false
+                })
+
+                if (key !== -1) {
+                    keys = key;
+                    break;
+                } else continue;
+            }
+            if (keys !== -1) return techs[keys]
+            else return false
+        }
+
+
     }
 
 }

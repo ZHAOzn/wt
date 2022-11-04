@@ -37,7 +37,7 @@ export default class DevController extends Controller {
 
     public async checkOldDevs() {
         const { ctx } = this;
-        const { lang, num, page } = ctx.query;
+        const { lang, num, page, max, count } = ctx.query;
         // const list = []
         // for (let i = 0; i < 66; i++) {
         //     const res = await ctx.service.dev.checkDev(lang, '手动', 18, i++)
@@ -79,7 +79,7 @@ export default class DevController extends Controller {
             }
         }
         else {
-            for (let i = 18; i >= 1; i--) {
+            for (let i = Number(max); i >= (Number(max) - Number(count)); i--) {
                 const foreignData = await ctx.service.dev.checkDev(lang, '手动', 18, i)
                 const localData = await ctx.service.dev.index();
                 if (!foreignData || foreignData.length <= 0) {

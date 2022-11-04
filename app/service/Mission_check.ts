@@ -3,7 +3,7 @@ export default class MissionCheckService extends Service {
     public async index() {
         const { ctx, app } = this;
         const { Op } = app.Sequelize
-        return await ctx.model.MissionCheck.findOne({ where: { status: { [Op.or]: ['0', '2'] } },order:[['created_at','DESC']] });
+        return await ctx.model.MissionCheck.findOne({ where: { status: { [Op.or]: ['0', '2'] } }, order: [['created_at', 'DESC'], ['id', 'DESC']] });
     }
 
     public async insert(mission: { url: string, table: string, dev_id: number, key: string, status?: number }) {
