@@ -18,7 +18,8 @@ export default class DevService extends Service {
         return await app.model.Dev.findByPk(id, {
             include: [
                 { model: ctx.model.DevEn, as: "en" },
-                { model: ctx.model.DevZh, as: "zh" }
+                { model: ctx.model.DevZh, as: "zh" },
+                { model: ctx.model.Tech, as: 'tech' }
             ]
         })
     }
@@ -36,8 +37,21 @@ export default class DevService extends Service {
     public async update(id: number, data: any) {
         const { ctx } = this;
         // await ctx.model.Dev.update({ ...data }, { where: { id: id } })
-        return await ctx.model.Dev.sequelize?.query(`UPDATE dev set type = concat(IFNULL(type,''),'${data.type}') , tech_id = '${data.tech}' WHERE id=${id}`)
+        return await ctx.model.Dev.sequelize?.query(`UPDATE dev set tech_id = '${data.tech}' WHERE id=${id}`)
+        // return await ctx.model.Dev.sequelize?.query(`UPDATE dev set type = concat(IFNULL(type,''),'${data.type}') , tech_id = '${data.tech}' WHERE id=${id}`)
         // return {results,metadata}
+    }
+
+    /**
+     * 更新dev info 表
+     * @param id 目标id
+     * @param lang 目标语言
+     * @param data 更新的数据
+     * @returns 更新结果
+     */
+    public async updateInfo(id: number, lang: string, data: any) {
+        const { ctx } = this;
+        return lang === 'zh' ? await ctx.model.DevZh.update(data, { where: { id } }) : await ctx.model.DevEn.update(data, { where: { id } })
     }
 
     public async insertInfo(lang: string, data: any) {

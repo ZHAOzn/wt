@@ -6,10 +6,15 @@ export default class MissionCheckService extends Service {
         return await ctx.model.MissionCheck.findOne({ where: { status: { [Op.or]: ['0', '2'] } }, order: [['created_at', 'DESC'], ['id', 'DESC']] });
     }
 
-    public async insert(mission: { url: string, table: string, dev_id: number, key: string, status?: number }) {
+    public async list() {
         const { ctx } = this;
-        const { url, table, key, dev_id, status } = mission
-        return await ctx.model.MissionCheck.create({ url, table_name: table, key, dev_id, status: status ?? 0 })
+        return await ctx.model.MissionCheck.findAll();
+    }
+
+    public async insert(mission: { url: string, table: string, dev_id: number, key: string, lang: string, status?: number }) {
+        const { ctx } = this;
+        const { url, table, key, dev_id, status, lang } = mission
+        return await ctx.model.MissionCheck.create({ url, table_name: table, key, dev_id, lang, status: status ?? 0 })
     }
 
     public async update(id: number, nval) {

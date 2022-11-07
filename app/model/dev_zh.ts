@@ -10,6 +10,7 @@ export default function (app: Application) {
         intro: { type: STRING(255), allowNull: true },
         img: { type: TEXT, allowNull: false },
         lang: { type: STRING(5), allowNull: false },
+        info: { type: STRING(255), allowNull: true },
         time: { type: DATE, allowNull: false },
         recording_time: { type: DATE, allowNull: false },
         real_time_slot: { type: STRING(100), allowNull: true },
@@ -23,7 +24,7 @@ export default function (app: Application) {
 
     return class DevZh extends Model {
         static associate() {
-            (app.model.DevZh as any).belongsTo(app.model.Dev, { foreignKey: 'dev_id' ,targetKey:'id'});
+            (app.model.DevZh as any).belongsTo(app.model.Dev, { foreignKey: 'dev_id', targetKey: 'id' });
         }
     };
 

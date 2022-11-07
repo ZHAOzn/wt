@@ -5,7 +5,7 @@ export default function (app: Application) {
     const { STRING, INTEGER } = app.Sequelize
     const Model = app.model.define('dev', {
         id: { type: INTEGER, primaryKey: true, autoIncrement: true },
-        type: { type: STRING(50), allowNull: true },
+        info: { type: STRING(255), allowNull: true },
         version_id: { type: INTEGER, allowNull: false },
         tech_id: { type: INTEGER, allowNull: true },
         is_before_dev: { type: INTEGER, allowNull: true }

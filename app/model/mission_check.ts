@@ -8,6 +8,7 @@ export default function (app: Application) {
         table_name: { type: STRING(50), allowNull: false },
         key: { type: STRING(100), allowNull: false },
         status: { type: INTEGER, allowNull: true },
+        lang: { type: STRING(5), allowNull: false },
         dev_id: { type: INTEGER }
     }, {
         timestamps: true,
