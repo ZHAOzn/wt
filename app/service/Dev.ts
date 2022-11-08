@@ -7,7 +7,8 @@ export default class DevService extends Service {
             ...opt, include: [
                 { model: ctx.model.DevEn, as: "en" },
                 { model: ctx.model.DevZh, as: "zh" },
-                { model: ctx.model.Tech, as: 'tech' }
+                { model: ctx.model.Tech, as: 'tech' },
+                { model: ctx.model.Version, as: 'version' }
             ],
             order: [['en', 'time', 'DESC'], ['zh', 'time', 'DESC'], ['created_at', 'DESC']]
         })
@@ -19,7 +20,8 @@ export default class DevService extends Service {
             include: [
                 { model: ctx.model.DevEn, as: "en" },
                 { model: ctx.model.DevZh, as: "zh" },
-                { model: ctx.model.Tech, as: 'tech' }
+                { model: ctx.model.Tech, as: 'tech' },
+                { model: ctx.model.Version, as: 'version' }
             ]
         })
     }

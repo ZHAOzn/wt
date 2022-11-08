@@ -22,7 +22,8 @@ export default function (app: Application) {
         static associate() {
             (app.model.Dev as any).hasOne(app.model.DevZh, { as: 'zh', foreignKey: 'dev_id', targetKey: 'id' });
             (app.model.Dev as any).hasOne(app.model.DevEn, { as: 'en', foreignKey: 'dev_id', targetKey: 'id' });
-            (app.model.Dev as any).belongsTo(app.model.Tech, { foreignKey: 'tech_id' })
+            (app.model.Dev as any).belongsTo(app.model.Tech, { foreignKey: 'tech_id' });
+            (app.model.Dev as any).belongsTo(app.model.Version, { foreignKey: 'version_id' });
         }
     };
 

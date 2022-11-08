@@ -19,7 +19,7 @@
     "ci": "npm run lint && npm run cov && npm run tsc",
     "autod": "autod",
     "lint": "eslint . --ext .ts --resolve-plugins-relative-to .",
-    "clean":"tsc -b --clean"
+    "clean": "tsc -b --clean"
   },
   "dependencies": {
     "axios": "^1.1.2",
@@ -27,6 +27,7 @@
     "egg": "^2.6.1",
     "egg-scripts": "^2.6.0",
     "egg-sequelize": "^6.0.0",
+    "egg-validate": "^2.0.2",
     "mysql2": "^2.3.3"
   },
   "devDependencies": {

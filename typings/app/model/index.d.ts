@@ -8,6 +8,7 @@ import ExportDevZh from '../../../app/model/dev_zh';
 import ExportMissionCheck from '../../../app/model/mission_check';
 import ExportRecordCheck from '../../../app/model/record_check';
 import ExportTech from '../../../app/model/tech';
+import ExportVersion from '../../../app/model/version';
 
 declare module 'egg' {
   interface IModel {
@@ -17,5 +18,6 @@ declare module 'egg' {
     MissionCheck: ReturnType<typeof ExportMissionCheck>;
     RecordCheck: ReturnType<typeof ExportRecordCheck>;
     Tech: ReturnType<typeof ExportTech>;
+    Version: ReturnType<typeof ExportVersion>;
   }
 }

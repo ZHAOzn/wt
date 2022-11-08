@@ -26,7 +26,6 @@ export default class checkDev extends Subscription {
                     if (isExist) {
                         //如果数据库里没有
                         if (!isExist.id) {
-
                             //dev表插入数据
                             const res = await ctx.service.dev.insert({ version_id: 3, ...iterator, is_before_dev: 0 });
                             //dev详情表插入数据

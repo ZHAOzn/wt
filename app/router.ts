@@ -9,6 +9,17 @@ export default (app: Application) => {
 
 
   /**
+   * 获取版本列表
+   */
+  router.get('/version/list', controller.version.index)
+
+  /**
+   * 新增版本
+   */
+  router.post('/version/insert', controller.version.insert)
+  
+
+  /**
    * 爬取dev
    */
   router.get('/dev/checkdevs', controller.dev.checkOldDevs)

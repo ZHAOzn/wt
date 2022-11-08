@@ -6,6 +6,7 @@ import ExportDev from '../../../app/controller/dev';
 import ExportHome from '../../../app/controller/home';
 import ExportRecordCheck from '../../../app/controller/record_check';
 import ExportTech from '../../../app/controller/tech';
+import ExportVersion from '../../../app/controller/version';
 
 declare module 'egg' {
   interface IController {
@@ -13,5 +14,6 @@ declare module 'egg' {
     home: ExportHome;
     recordCheck: ExportRecordCheck;
     tech: ExportTech;
+    version: ExportVersion;
   }
 }

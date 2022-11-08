@@ -12,6 +12,7 @@ import ExportRecordCheck from '../../../app/service/Record_check';
 import ExportTech from '../../../app/service/Tech';
 import ExportTest from '../../../app/service/Test';
 import ExportUtils from '../../../app/service/Utils';
+import ExportVersion from '../../../app/service/Version';
 
 declare module 'egg' {
   interface IService {
@@ -21,5 +22,6 @@ declare module 'egg' {
     tech: AutoInstanceType<typeof ExportTech>;
     test: AutoInstanceType<typeof ExportTest>;
     utils: AutoInstanceType<typeof ExportUtils>;
+    version: AutoInstanceType<typeof ExportVersion>;
   }
 }
