@@ -17,8 +17,13 @@ export default (app: Application) => {
    * 新增版本
    */
   router.post('/version/insert', controller.version.insert)
-  
 
+  /**
+   * 更新版本信息
+   */
+  router.post('/version/update', controller.version.update)
+
+  
   /**
    * 爬取dev
    */

@@ -125,6 +125,59 @@ export default class DevService extends Service {
     }
 
     /**
+     * 处理从官网请求来的dev数据
+     * 判断数据库中是否已经存在，新增或更新
+     * @param lang 语言
+     */
+    public async handleDevData(lang: string) {
+        const { ctx, app } = this;
+        const { Op } = require("sequelize")
+        const foreignData = await ctx.service.dev.checkDev(lang, '自动', 2);
+        const localData = await ctx.service.dev.index({ limit: 10, order: [['en', 'time', 'DESC'], ['zh', 'time', 'DESC'], ['created_at', 'DESC']] })
+        const version = (await ctx.service.version.index({ limit: 1, where: { id: { [Op.ne]: 4 } }, order: [['year', 'DESC'], ['num', 'Desc']] }))[0]
+
+        let is_before_dev = 0;
+        const nowDate = await app.utils.getDate();
+        if (version && (version as any).update_time) {
+            const update_time = await app.utils.getDate((version as any).update_time)
+            if (nowDate.timestamp - update_time.timestamp > 0)
+                is_before_dev = 1
+        }
+
+        if (foreignData && foreignData.length > 0)
+            for (const iterator of foreignData) {
+                const isExist = await ctx.service.dev.isExist(localData, iterator)
+                // isExists.push(isExist)
+
+                if (isExist) {
+                    //如果数据库里没有
+                    if (!isExist.id) {
+                        //dev表插入数据
+                        const res = await ctx.service.dev.insert({ version_id: (version as any).id, ...iterator, is_before_dev });
+                        //dev详情表插入数据
+                        await ctx.service.dev.insertInfo(lang, { dev_id: (res as any).id, ...iterator, time: iterator.date, recording_time: new Date(), lang, real_time_slot: await ctx.service.dev.getTimeSlot(new Date(), 12 * 60000) })
+                        ctx.service.missionCheck.insert({
+                            url: iterator.link, table: 'Dev', dev_id: (res as any).id, key: 'type,tech', lang
+                        })
+                    }
+                    //如果数据库里有 
+                    else {
+                        const key = isExist.data.findIndex(val => val === lang)
+                        //如果数据库里没有详情
+                        if (key === -1) {
+                            await ctx.service.dev.insertInfo(lang, { dev_id: isExist.id, ...iterator, time: iterator.date, recording_time: new Date(), lang, real_time_slot: await ctx.service.dev.getTimeSlot(new Date(), 12 * 60000) })
+                            ctx.service.missionCheck.insert({ url: iterator.link, table: 'Dev', dev_id: isExist.id, key: 'type,tech', lang })
+                        }
+                    }
+
+                }
+
+
+            }
+
+    }
+
+    /**
      * 向wit官网请求dev详情
      * @param url 目标地址
      * @param type 检索类型

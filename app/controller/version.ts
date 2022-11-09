@@ -15,4 +15,12 @@ export default class VersionClass extends Controller {
         ctx.validate({ name: 'string?', version_code: 'string?', year: 'string', num: 'int', update_time: 'datetime?', live_time: 'datetime?', test_num: 'int?' })
         ctx.body = await ctx.service.version.insert({ name, version_code, year, num, update_time, live_time, test_num })
     }
+
+    public async update() {
+        const { ctx } = this;
+        const { id, name, version_code, year, num, update_time, live_time, test_num } = ctx.request.body;
+        ctx.validate({ id: 'int', name: 'string?', version_code: 'string?', year: 'string?', num: 'int?', update_time: 'datetime?', live_time: 'datetime?', test_num: 'int?' })
+        const res = await ctx.service.version.update({ name, version_code, year, num, update_time, live_time, test_num }, id)
+        ctx.body = res ? { code: 200, msg: "更新成功", data: res } : { code: 404, msg: "更新服务无返回结果", data: res }
+    }
 }
