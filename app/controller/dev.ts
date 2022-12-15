@@ -115,7 +115,7 @@ export default class DevController extends Controller {
             const dev = await ctx.service.dev.getDev(iterator.dev_id)
             if (!dev) continue;
             if (Object.keys(dev).findIndex(val => lang === val) === -1) continue;
-            
+
             if (!(!dev[lang].info || dev[lang].info === '' || dev[lang].info === null)) continue;
 
             const req = await ctx.service.missionCheck.update(iterator.id, { status: 0 })

@@ -221,6 +221,12 @@ export default class DevService extends Service {
         }
     }
 
+    /**
+     * 判断dev是否存在
+     * @param array 本地数据
+     * @param data spider数据
+     * @returns \{ id: number|null, data: []}
+     */
     public async isExist(array, data) {
         /**返回true为存在 */
         const rule_1 = (img_1: string, img_2: string) => {
@@ -228,8 +234,8 @@ export default class DevService extends Service {
             if (!img_1 || !img_2) return false;
 
             //获取两个img的文件名，并根据符号'_'转化为数组
-            const img_1_name = img_1.split('/')[img_1.split('/').length - 1].split('_')
-            const img_2_name = img_2.split('/')[img_2.split('/').length - 1].split('_')
+            const img_1_name = img_1.split('/')[img_1.split('/').length - 1].replace('__','_').split('_')
+            const img_2_name = img_2.split('/')[img_2.split('/').length - 1].replace('__','_').split('_')
 
             //如果两个转化数组失败，则返回false
             if (!(Array.isArray(img_1_name) && Array.isArray(img_2_name))) return false;
@@ -250,7 +256,7 @@ export default class DevService extends Service {
             }
 
             //当两个数组中，相等的比例大于70%时，判定为相等，返回true;
-            if (num / length > 0.7) return true;
+            if (num / length > 0.65) return true;
             else return false;
 
 
@@ -293,6 +299,11 @@ export default class DevService extends Service {
         // return `${latest.getHours()}:${latest.getMinutes()}:${latest.getSeconds()} —— ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
     }
 
+    /**
+     * 判断dev载具所属科技树
+     * @param tech 疑似tech的信息字符串或字符串数组
+     * @returns tech_id或false
+     */
     public async getTech(tech: string | string[]) {
         const { ctx } = this;
         if (!Array.isArray(tech)) {

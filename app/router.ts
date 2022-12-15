@@ -23,7 +23,7 @@ export default (app: Application) => {
    */
   router.post('/version/update', controller.version.update)
 
-  
+
   /**
    * 爬取dev
    */
