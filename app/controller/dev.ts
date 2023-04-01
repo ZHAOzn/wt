@@ -4,9 +4,16 @@ export default class DevController extends Controller {
     public async index() {
         const { ctx } = this;
         const { limit } = ctx.query
-        const opt: { limit?: number } = {}
-        if (limit) opt.limit = Number(limit)
+        const opt: { limit?: number, order?: string[][] } = {}
 
+        const order: string[][] = []
+        if (ctx.query.order) {
+            const orderParams = ctx.query.order.replace(/\s*/g, "");
+            orderParams.split('|').forEach((item) => order.push(item.split(',')))
+        }
+
+        if (limit) opt.limit = Number(limit)
+        if (order.length > 0) opt.order = order
         ctx.body = await ctx.service.dev.index(opt)
     }
 

@@ -16,6 +16,7 @@ export default class VersionClass extends Controller {
         ctx.body = await ctx.service.version.insert({ name, version_code, year, num, update_time, live_time, test_num })
     }
 
+    /**更新版本 */
     public async update() {
         const { ctx } = this;
         const { id, name, version_code, year, num, update_time, live_time, test_num } = ctx.request.body;

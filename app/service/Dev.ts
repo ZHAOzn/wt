@@ -10,7 +10,7 @@ export default class DevService extends Service {
                 { model: ctx.model.Tech, as: 'tech' },
                 { model: ctx.model.Version, as: 'version' }
             ],
-            order: [['en', 'time', 'DESC'], ['zh', 'time', 'DESC'], ['created_at', 'DESC']]
+            // order: [['en', 'time', 'DESC'], ['zh', 'time', 'DESC'], ['created_at', 'DESC']]
         })
     }
 
@@ -133,9 +133,11 @@ export default class DevService extends Service {
         const { ctx, app } = this;
         const { Op } = require("sequelize")
         const foreignData = await ctx.service.dev.checkDev(lang, '自动', 2);
-        const localData = await ctx.service.dev.index({ limit: 10, order: [['en', 'time', 'DESC'], ['zh', 'time', 'DESC'], ['created_at', 'DESC']] })
+        const localDataOrderRule = lang ==='en'?['en', 'time', 'DESC']:['zh', 'time', 'DESC']
+        const localData = await ctx.service.dev.index({ limit: 10, order: [localDataOrderRule, ['created_at', 'DESC']] })
         const version = (await ctx.service.version.index({ limit: 1, where: { id: { [Op.ne]: 4 } }, order: [['year', 'DESC'], ['num', 'Desc']] }))[0]
 
+        //判断dev发布时间在版本更新前或后
         let is_before_dev = 0;
         const nowDate = await app.utils.getDate();
         if (version && (version as any).update_time) {
@@ -148,7 +150,6 @@ export default class DevService extends Service {
             for (const iterator of foreignData) {
                 const isExist = await ctx.service.dev.isExist(localData, iterator)
                 // isExists.push(isExist)
-
                 if (isExist) {
                     //如果数据库里没有
                     if (!isExist.id) {
@@ -268,6 +269,12 @@ export default class DevService extends Service {
             const key = array.findIndex(val => {
                 return val?.zh?.img === data.img || val?.en?.img === data.img || rule_1(val?.zh?.img, data.img) || rule_1(val?.en?.img, data.img)
             })
+            
+            // console.log(key);
+            // console.log(array[0]);
+            
+            // console.log(data);
+            
 
             if (key !== -1) {
                 const res: string[] = []
