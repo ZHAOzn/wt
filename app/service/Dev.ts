@@ -133,8 +133,8 @@ export default class DevService extends Service {
         const { ctx, app } = this;
         const { Op } = require("sequelize")
         const foreignData = await ctx.service.dev.checkDev(lang, '自动', 2);
-        const localDataOrderRule = lang ==='en'?['en', 'time', 'DESC']:['zh', 'time', 'DESC']
-        const localData = await ctx.service.dev.index({ limit: 10, order: [localDataOrderRule, ['created_at', 'DESC']] })
+        // const localDataOrderRule = lang === 'en' ? [['en', 'time', 'DESC'],['zh', 'time', 'DESC']] : [['zh', 'time', 'DESC'],['en', 'time', 'DESC']]
+        const localData = await ctx.service.dev.index({ limit: 10, order: [ ['created_at', 'DESC']] })
         const version = (await ctx.service.version.index({ limit: 1, where: { id: { [Op.ne]: 4 } }, order: [['year', 'DESC'], ['num', 'Desc']] }))[0]
 
         //判断dev发布时间在版本更新前或后
@@ -235,8 +235,8 @@ export default class DevService extends Service {
             if (!img_1 || !img_2) return false;
 
             //获取两个img的文件名，并根据符号'_'转化为数组
-            const img_1_name = img_1.split('/')[img_1.split('/').length - 1].replace('__','_').split('_')
-            const img_2_name = img_2.split('/')[img_2.split('/').length - 1].replace('__','_').split('_')
+            const img_1_name = img_1.split('/')[img_1.split('/').length - 1].replace('__', '_').split('_')
+            const img_2_name = img_2.split('/')[img_2.split('/').length - 1].replace('__', '_').split('_')
 
             //如果两个转化数组失败，则返回false
             if (!(Array.isArray(img_1_name) && Array.isArray(img_2_name))) return false;
@@ -266,15 +266,15 @@ export default class DevService extends Service {
         if (data.img) {
             // const key = array.findIndex(val => val?.zh?.img === data.img || val?.en?.img === data.img)
 
+            // console.log([{ id: array[0].id, en: { id: array[0].en?.id, name: array[0].en?.name, img: array[0].en?.img },zh:{id: array[0].zh?.id, name: array[0].zh?.name, img: array[0].zh?.img} },
+            //     { id: array[1].id, en: { id: array[1].en?.id, name: array[1].en?.name, img: array[1].en?.img },zh:{id: array[1].zh?.id, name: array[1].zh?.name, img: array[1].zh?.img} }]);
+
             const key = array.findIndex(val => {
                 return val?.zh?.img === data.img || val?.en?.img === data.img || rule_1(val?.zh?.img, data.img) || rule_1(val?.en?.img, data.img)
             })
-            
             // console.log(key);
             // console.log(array[0]);
-            
             // console.log(data);
-            
 
             if (key !== -1) {
                 const res: string[] = []
